@@ -15,7 +15,8 @@
     <Namespace Name="DataClasses.ViewModels" Seralize="All" />
 -->
 
-<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata"
+            xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps">
   <Application>
     <!--
       An Assembly element with Name="*Application*" applies to all assemblies in

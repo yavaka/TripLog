@@ -20,7 +20,7 @@ namespace TripLog.UWP
         public MainPage()
         {
             this.InitializeComponent();
-
+            Xamarin.FormsMaps.Init("joYebvD8BRBH9ktAv0zN~Quiy_bxerPhIb9YCVwu0wA~Ap-CPPkLQz0rb1qTzH07KPJ-d7YCoOKMNQJvrE1S1mySDiM2dNMBaSfUkhfEMgh0");
             LoadApplication(new TripLog.App());
         }
     }

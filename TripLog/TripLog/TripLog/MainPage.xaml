@@ -2,13 +2,24 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:TripLog"
-             x:Class="TripLog.MainPage">
+             x:Class="TripLog.MainPage"
+             Title="TripLog">
 
-    <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
-    </StackLayout>
+
+    <!--Toolbar-->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="New" Clicked="New_Clicked"/>
+    </ContentPage.ToolbarItems>
+
+    <!--Page content-->
+    <ContentPage.Content>
+        <ListView x:Name="trips" ItemTapped="Trips_ItemTapped">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Title}" Detail="{Binding Notes}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ContentPage.Content>
 
 </ContentPage>
