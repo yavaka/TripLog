@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripLog.Android", "TripLog\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripLog.iOS", "TripLog\TripLog.iOS\TripLog.iOS.csproj", "{7A1ECD50-D4A1-44B7-9884-03AC9FF39D62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripLog", "TripLog\TripLog\TripLog.csproj", "{A555AAEB-D449-4217-8CD8-EFF3EF17B727}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripLog", "TripLog\TripLog\TripLog.csproj", "{A555AAEB-D449-4217-8CD8-EFF3EF17B727}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
