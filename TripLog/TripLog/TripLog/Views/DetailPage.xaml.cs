@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TripLog.Models;
+using TripLog.Services;
 using TripLog.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
@@ -14,10 +16,24 @@ namespace TripLog.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class DetailPage : ContentPage
     {
-        public DetailPage(TripLogEntry entry)
+        public DetailPage()
         {
             InitializeComponent();
 
+            BindingContext = new DetailViewModel(DependencyService.Get<INavService>());
+        }
+
+        DetailViewModel _detailViewModel
+        {
+            get { return BindingContext as DetailViewModel; }
+        }
+
+        private void UpdateMap()
+        {
+            if (_detailViewModel.Entry == null)
+            {
+                return;
+            }
 
             //Set region
             map.MoveToRegion(MapSpan.FromCenterAndRadius(
@@ -32,18 +48,34 @@ namespace TripLog.Views
                 Position = new Position(_detailViewModel.Entry.Latitude, _detailViewModel.Entry.Longitude)
             };
             map.Pins.Add(pin);
-
-            BindingContext = new DetailViewModel(entry);
-
-            //title.Text = entry.Title;
-            //date.Text = entry.Date.ToString("M");
-            //rating.Text = $"{entry.Rating} star rating";
-            //notes.Text = entry.Notes;
         }
 
-        DetailViewModel _detailViewModel
+        private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            get { return BindingContext as DetailViewModel; }
+            if (args.PropertyName == nameof(DetailViewModel.Entry))
+            {
+                UpdateMap();
+            }
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (_detailViewModel != null)
+            {
+                _detailViewModel.PropertyChanged += OnViewModelPropertyChanged;
+            }
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            if (_detailViewModel != null)
+            {
+                _detailViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            }
         }
     }
 }

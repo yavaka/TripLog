@@ -8,7 +8,7 @@
 
     <!--Toolbar-->
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="New" Clicked="New_Clicked"/>
+        <ToolbarItem Text="New" Command="{Binding NewCommand}"/>
     </ContentPage.ToolbarItems>
 
     <!--Page content-->

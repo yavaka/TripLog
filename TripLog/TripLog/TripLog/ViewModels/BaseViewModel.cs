@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
+using TripLog.Services;
 
 namespace TripLog.ViewModels
 {
     //Abstract class which contain basic functionality
     public abstract class BaseViewModel : INotifyPropertyChanged
     {
-        protected BaseViewModel()
+        protected INavService NavService { get; private set; }
+        protected BaseViewModel(INavService navService)
         {
-
+            NavService = navService;
         }
+
+        public abstract Task Init();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -20,5 +25,20 @@ namespace TripLog.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    //Second abstract class with generic type to pass strongly typed parameters to Init method
+    public abstract class BaseViewModel<TParameter> : BaseViewModel
+    {
+        protected BaseViewModel() : base()
+        {
+        }
+
+        public override async Task Init()
+        {
+            await Init(default(TParameter));
+        }
+
+        public abstract Task Init(TParameter parameter);
     }
 }

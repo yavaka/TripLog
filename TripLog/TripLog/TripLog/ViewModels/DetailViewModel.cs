@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TripLog.Models;
 
 namespace TripLog.ViewModels
 {
-    public class DetailViewModel : BaseViewModel
+    public class DetailViewModel : BaseViewModel<TripLogEntry>
     {
-        public DetailViewModel(TripLogEntry entry)
+        public DetailViewModel()
         {
-            Entry = entry;
         }
 
         TripLogEntry _entry;
@@ -23,5 +23,9 @@ namespace TripLog.ViewModels
             }
         }
 
+        public override async Task Init(TripLogEntry logEntry)
+        {
+            Entry = logEntry;
+        }
     }
 }
