@@ -4,13 +4,14 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
 using TripLog.Models;
+using TripLog.Services;
 using Xamarin.Forms;
 
 namespace TripLog.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        public MainViewModel()
+        public MainViewModel(INavService navService)
         {
             LogEntries = new ObservableCollection<TripLogEntry>();
         }

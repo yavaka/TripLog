@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TripLog.Models;
+using TripLog.Services;
 using Xamarin.Forms;
 
 namespace TripLog.ViewModels
 {
     public class NewEntryViewModel : BaseViewModel
     {
-        public NewEntryViewModel()
+        public NewEntryViewModel(INavService navService, ILocationService locService)
+            :base(navService)
         {
+            _locService = locService;
             Date = DateTime.Today;
             Rating = 1;
         }
@@ -84,15 +88,20 @@ namespace TripLog.ViewModels
         Command _saveCommand;
         public Command SaveCommand
         {
-            get { return _saveCommand ?? (_saveCommand = new Command(ExecuteSaveCommand, CanSave)); }
+            get
+            {
+                return _saveCommand
+                    ?? (_saveCommand = new Command(async () =>
+                    await ExecuteSaveCommand(), CanSave));
+            }
         }
 
-        private bool CanSave(object arg)
+        private bool CanSave()
         {
             return !string.IsNullOrWhiteSpace(Title);
         }
 
-        void ExecuteSaveCommand(object obj)
+        private async Task ExecuteSaveCommand()
         {
             var newItem = new TripLogEntry
             {
@@ -103,7 +112,20 @@ namespace TripLog.ViewModels
                 Rating = Rating,
                 Notes = Notes
             };
-            //TODO: Presist Entry in a later chapter
+
+            await NavService.GoBack();
         }
+        
+        //Get coordinates for location service
+        public override async Task Init()
+        {
+            
+            var coords = await _locService.GetGeoCoordinatesAsync();
+            Latitude = coords.Latitude;
+            Longitude = coords.Longitude;
+        }
+
+        //Location service
+        public readonly ILocationService _locService;
     }
 }

@@ -30,8 +30,9 @@ namespace TripLog.ViewModels
     //Second abstract class with generic type to pass strongly typed parameters to Init method
     public abstract class BaseViewModel<TParameter> : BaseViewModel
     {
-        protected BaseViewModel() : base()
+        protected BaseViewModel(INavService navService) : base(navService)
         {
+
         }
 
         public override async Task Init()
