@@ -9,7 +9,7 @@ using TripLog.Services;
 using TripLog.ViewModels;
 using Xamarin.Forms;
 
-[assembly: Dependency(typeof(XamarinFormsNavService))]
+
 namespace TripLog.Services
 {
     public class XamarinFormsNavService : INavService

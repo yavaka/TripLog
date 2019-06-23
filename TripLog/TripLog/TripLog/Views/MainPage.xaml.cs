@@ -18,9 +18,6 @@ namespace TripLog.Views
     {
         public MainPage()
         {
-            InitializeComponent();
-
-            BindingContext = new MainViewModel(DependencyService.Get<INavService>());
         }
 
         //Call Init method when page first appears
