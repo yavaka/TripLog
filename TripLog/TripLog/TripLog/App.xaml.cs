@@ -1,38 +1,37 @@
-﻿using Ninject;
+﻿using System;
+using Ninject;
 using Ninject.Modules;
-using System;
 using TripLog.Modules;
-using TripLog.Services;
 using TripLog.ViewModels;
 using TripLog.Views;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace TripLog
 {
     public partial class App : Application
     {
+        public IKernel Kernel { get; set; }
+
         public App(params INinjectModule[] platformModules)
         {
-            //Create new instance of the navigation service
+            InitializeComponent();
+
             var mainPage = new NavigationPage(new MainPage());
-            var navService = DependencyService.Get<INavService>() as XamarinFormsNavService;
 
-            //Register core services
-            Kernel = new StandardKernel(
-                new TripLogCoreModule(),
-                new TripLogNavModule(mainPage.Navigation));
+            var settings = new NinjectSettings();
+            settings.LoadExtensions = false;
 
-            //Register platform specific services
+            // Register core services
+            Kernel = new StandardKernel(settings,new TripLogCoreModule(), new TripLogNavModule(mainPage.Navigation));
+
+            // Register platform specific services
             Kernel.Load(platformModules);
 
-            //Get the MainViewModel from the IoC container
+            // Get the MainViewModel from the IoC
             mainPage.BindingContext = Kernel.Get<MainViewModel>();
 
             MainPage = mainPage;
         }
-
-        public IKernel Kernel{ get; set; }
 
         protected override void OnStart()
         {

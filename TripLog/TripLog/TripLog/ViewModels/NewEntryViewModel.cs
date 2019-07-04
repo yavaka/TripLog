@@ -10,13 +10,7 @@ namespace TripLog.ViewModels
 {
     public class NewEntryViewModel : BaseViewModel
     {
-        public NewEntryViewModel(INavService navService, ILocationService locService)
-            :base(navService)
-        {
-            _locService = locService;
-            Date = DateTime.Today;
-            Rating = 1;
-        }
+        readonly ILocationService _locService;
 
         string _title;
         public string Title
@@ -90,42 +84,62 @@ namespace TripLog.ViewModels
         {
             get
             {
-                return _saveCommand
-                    ?? (_saveCommand = new Command(async () =>
-                    await ExecuteSaveCommand(), CanSave));
+                return _saveCommand ?? (_saveCommand = new Command(async () => await ExecuteSaveCommand(), CanSave));
             }
         }
 
-        private bool CanSave()
+        public NewEntryViewModel(INavService navService, ILocationService locService) : base(navService)
         {
-            return !string.IsNullOrWhiteSpace(Title);
+            _locService = locService;
+
+            Date = DateTime.Today;
+            Rating = 1;
         }
 
-        private async Task ExecuteSaveCommand()
-        {
-            var newItem = new TripLogEntry
-            {
-                Title = Title,
-                Latitude = Latitude,
-                Longitude = Longitude,
-                Date = Date,
-                Rating = Rating,
-                Notes = Notes
-            };
-
-            await NavService.GoBack();
-        }
-        
-        //Get coordinates for location service
         public override async Task Init()
         {
-            
             var coords = await _locService.GetGeoCoordinatesAsync();
             Latitude = coords.Latitude;
             Longitude = coords.Longitude;
         }
 
-        //Location service
-        public readonly ILocationService _locService;
+        async Task ExecuteSaveCommand()
+        {
+            if (IsBusy)
+            {
+                return;
+            }
+
+            IsBusy = true;
+
+            try
+            {
+                var newItem = new TripLogEntry
+                {
+                    Title = Title,
+                    Latitude = Latitude,
+                    Longitude = Longitude,
+                    Date = Date,
+                    Rating = Rating,
+                    Notes = Notes
+                };
+
+                // TODO: Persist Entry in a later chapter.
+
+                // TODO: Remove this in Chapter 6
+                await Task.Delay(3000);
+
+                await NavService.GoBack();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        bool CanSave()
+        {
+            return !string.IsNullOrWhiteSpace(Title);
+        }
     }
 }

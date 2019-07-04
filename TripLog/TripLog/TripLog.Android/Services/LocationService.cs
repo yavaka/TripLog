@@ -20,7 +20,6 @@ namespace TripLog.Droid.Services
     {
         TaskCompletionSource<Location> _tcs;
 
-        [Obsolete]
         public async Task<GeoCoords> GetGeoCoordinatesAsync()
         {
             var manager = (LocationManager)Forms.Context.GetSystemService(Context.LocationService);

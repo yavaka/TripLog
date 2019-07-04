@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TripLog.Models;
-using TripLog.Services;
 using TripLog.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
@@ -16,38 +10,36 @@ namespace TripLog.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class DetailPage : ContentPage
     {
-        public DetailPage()
-        {
-        }
-
-        DetailViewModel _detailViewModel
+        DetailViewModel _vm
         {
             get { return BindingContext as DetailViewModel; }
         }
 
-        private void UpdateMap()
+        public DetailPage()
         {
-            if (_detailViewModel.Entry == null)
+            InitializeComponent();
+        }
+
+        void UpdateMap()
+        {
+            if (_vm.Entry == null)
             {
                 return;
             }
 
-            //Set region
-            map.MoveToRegion(MapSpan.FromCenterAndRadius(
-                new Position(_detailViewModel.Entry.Latitude, _detailViewModel.Entry.Longitude)
-                , Distance.FromMiles(.5)));
+            // Center the map around the log entry's location
+            map.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(_vm.Entry.Latitude, _vm.Entry.Longitude), Distance.FromMiles(.5)));
 
-            //Create new pin
-            var pin = new Pin()
+            // Place a pin on the map for the log entry's location
+            map.Pins.Add(new Pin
             {
                 Type = PinType.Place,
-                Label = _detailViewModel.Entry.Title,
-                Position = new Position(_detailViewModel.Entry.Latitude, _detailViewModel.Entry.Longitude)
-            };
-            map.Pins.Add(pin);
+                Label = _vm.Entry.Title,
+                Position = new Position(_vm.Entry.Latitude, _vm.Entry.Longitude)
+            });
         }
 
-        private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs args)
+        void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == nameof(DetailViewModel.Entry))
             {
@@ -59,9 +51,9 @@ namespace TripLog.Views
         {
             base.OnAppearing();
 
-            if (_detailViewModel != null)
+            if (_vm != null)
             {
-                _detailViewModel.PropertyChanged += OnViewModelPropertyChanged;
+                _vm.PropertyChanged += OnViewModelPropertyChanged;
             }
         }
 
@@ -69,9 +61,9 @@ namespace TripLog.Views
         {
             base.OnDisappearing();
 
-            if (_detailViewModel != null)
+            if (_vm != null)
             {
-                _detailViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+                _vm.PropertyChanged -= OnViewModelPropertyChanged;
             }
         }
     }

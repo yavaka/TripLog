@@ -3,26 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using TripLog.Services;
 using TripLog.ViewModels;
 using Xamarin.Forms;
-
 
 namespace TripLog.Services
 {
     public class XamarinFormsNavService : INavService
     {
-        //Provide reference to Xamarin.Forms.INavigation
-        public INavigation XamarinFormsNav { get; set; }
+        readonly IDictionary<Type, Type> _map = new Dictionary<Type, Type>();
 
-        //Implement the navigation service with a page-to-ViewModel mapping
-        readonly Dictionary<Type, Type> _map = new Dictionary<Type, Type>();
-        public void RegisterViewMapping(Type viewModel, Type view)
-        {
-            _map.Add(viewModel, view);
-        }
+        public event PropertyChangedEventHandler CanGoBackChanged;
+
+        public INavigation XamarinFormsNav { get; set; }
 
         public bool CanGoBack
         {
@@ -33,57 +26,13 @@ namespace TripLog.Services
             }
         }
 
-        public event PropertyChangedEventHandler CanGoBackChanged;
-
-        private void OnCanGoBackChanged()
-        {
-            CanGoBackChanged?.Invoke(this, new PropertyChangedEventArgs("CanGoBack"));
-        }
-
-        private async Task NavigateToView(Type viewModelType)
-        {
-            Type viewType;
-            if (!_map.TryGetValue(viewModelType, out viewType))
-            {
-                throw new ArgumentException($"No view found in View Mapping for {viewModelType.FullName}.");
-            }
-
-            var constructor = viewType.GetTypeInfo()
-                .DeclaredConstructors
-                .FirstOrDefault(dc => dc.GetParameters().Count() <= 0);
-
-            var view = constructor.Invoke(null) as Page;
-
-            //DI for viewModels
-            var vm = ((App)Application.Current)
-                .Kernel
-                .GetService(viewModelType);
-            view.BindingContext = vm;
-
-            await XamarinFormsNav.PushAsync(view, true);
-
-        }
-
-
-        public async Task ClearBackStack()
-        {
-            if (XamarinFormsNav.NavigationStack.Count <= 1)
-            {
-                return;
-            }
-
-            for (int i = 0; i < XamarinFormsNav.NavigationStack.Count - 1; i++)
-            {
-                XamarinFormsNav.RemovePage(XamarinFormsNav.NavigationStack[i]);
-            }
-        }
-
         public async Task GoBack()
         {
             if (CanGoBack)
             {
                 await XamarinFormsNav.PopAsync(true);
             }
+
             OnCanGoBackChanged();
         }
 
@@ -96,7 +45,6 @@ namespace TripLog.Services
                 await ((BaseViewModel)(XamarinFormsNav.NavigationStack.Last().BindingContext)).Init();
             }
         }
-
         public async Task NavigateTo<TVM, TParameter>(TParameter parameter) where TVM : BaseViewModel
         {
             await NavigateToView(typeof(TVM));
@@ -104,6 +52,29 @@ namespace TripLog.Services
             if (XamarinFormsNav.NavigationStack.Last().BindingContext is BaseViewModel<TParameter>)
             {
                 await ((BaseViewModel<TParameter>)(XamarinFormsNav.NavigationStack.Last().BindingContext)).Init(parameter);
+            }
+        }
+
+        public async Task RemoveLastView()
+        {
+            if (XamarinFormsNav.NavigationStack.Any())
+            {
+                var lastView = XamarinFormsNav.NavigationStack[XamarinFormsNav.NavigationStack.Count - 2];
+
+                XamarinFormsNav.RemovePage(lastView);
+            }
+        }
+
+        public async Task ClearBackStack()
+        {
+            if (XamarinFormsNav.NavigationStack.Count <= 1)
+            {
+                return;
+            }
+
+            for (var i = 0; i < XamarinFormsNav.NavigationStack.Count - 1; i++)
+            {
+                XamarinFormsNav.RemovePage(XamarinFormsNav.NavigationStack[i]);
             }
         }
 
@@ -117,13 +88,36 @@ namespace TripLog.Services
             Device.OpenUri(uri);
         }
 
-        public async Task RemoveLastView()
+
+        public void RegisterViewMapping(Type viewModel, Type view)
         {
-            if (XamarinFormsNav.NavigationStack.Any())
+            _map.Add(viewModel, view);
+        }
+
+        async Task NavigateToView(Type viewModelType)
+        {
+            Type viewType;
+
+            if (!_map.TryGetValue(viewModelType, out viewType))
             {
-                var lastView = XamarinFormsNav.NavigationStack[XamarinFormsNav.NavigationStack.Count - 2];
-                XamarinFormsNav.RemovePage(lastView);
+                throw new ArgumentException("No view found in view mapping for " + viewModelType.FullName + ".");
             }
+            var constructor = viewType.GetTypeInfo()
+                                      .DeclaredConstructors
+                                      .FirstOrDefault(dc => dc.GetParameters().Count() <= 0);
+
+            var view = constructor.Invoke(null) as Page;
+
+            var vm = ((App)Application.Current).Kernel.GetService(viewModelType);
+
+            view.BindingContext = vm;
+
+            await XamarinFormsNav.PushAsync(view, true);
+        }
+
+        void OnCanGoBackChanged()
+        {
+            CanGoBackChanged?.Invoke(this, new PropertyChangedEventArgs("CanGoBack"));
         }
     }
 }

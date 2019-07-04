@@ -13,9 +13,9 @@ namespace TripLog.Modules
     {
         //xf = XamarinForm
         readonly INavigation _xfNav;
-        public TripLogNavModule(INavigation xamarinFormNavigation)
+        public TripLogNavModule(INavigation xamarinFormsNavigation)
         {
-            _xfNav = xamarinFormNavigation;
+            _xfNav = xamarinFormsNavigation;
         }
 
         public override void Load()

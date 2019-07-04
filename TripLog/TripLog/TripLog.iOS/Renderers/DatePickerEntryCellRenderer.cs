@@ -61,7 +61,7 @@ namespace TripLog.iOS.Renderers
             };
 
             //Create a toolbar with a done button that will close the datePicker and set the selected value
-            var done = new UIBarButtonItem("Done", UIBarButtonItemStyle, (s, e) =>
+            var done = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, (s, e) =>
             {
                 var pickedDate = (DateTime)datePicker.Date;
 
