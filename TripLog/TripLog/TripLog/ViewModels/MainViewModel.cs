@@ -9,6 +9,17 @@ namespace TripLog.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        private readonly ITripLogDataService _tripLogDataService;
+
+        public MainViewModel(INavService navService, ITripLogDataService tripLogDataService) : base(navService)
+        {
+            //Azure Data Access
+            _tripLogDataService = tripLogDataService;
+
+            LogEntries = new ObservableCollection<TripLogEntry>();
+        }
+
+
         ObservableCollection<TripLogEntry> _logEntries;
         public ObservableCollection<TripLogEntry> LogEntries
         {
@@ -47,11 +58,7 @@ namespace TripLog.ViewModels
             }
         }
 
-        public MainViewModel(INavService navService) : base(navService)
-        {
-            LogEntries = new ObservableCollection<TripLogEntry>();
-        }
-
+        
         public override async Task Init()
         {
             await LoadEntries();
@@ -68,40 +75,17 @@ namespace TripLog.ViewModels
 
             LogEntries.Clear();
 
-            // TODO: Remove this in chapter 6
-            await Task.Delay(3000);
-
-            LogEntries.Add(new TripLogEntry
+            try
             {
-                Title = "Washington Monument",
-                Notes = "Amazing!",
-                Rating = 3,
-                Date = new DateTime(2017, 2, 5),
-                Latitude = 38.8895,
-                Longitude = -77.0352
-            });
+                //Get entries from azure database
+                var entries = await _tripLogDataService.GetEntriesAsync();
 
-            LogEntries.Add(new TripLogEntry
+                LogEntries = new ObservableCollection<TripLogEntry>(entries);
+            }
+            finally
             {
-                Title = "Statue of Liberty",
-                Notes = "Inspiring!",
-                Rating = 4,
-                Date = new DateTime(2017, 4, 13),
-                Latitude = 40.6892,
-                Longitude = -74.0444
-            });
-
-            LogEntries.Add(new TripLogEntry
-            {
-                Title = "Golden Gate Bridge",
-                Notes = "Foggy, but beautiful.",
-                Rating = 5,
-                Date = new DateTime(2017, 4, 26),
-                Latitude = 37.8268,
-                Longitude = -122.4798
-            });
-
-            IsBusy = false;
+                IsBusy = false;
+            }
         }
 
         async Task ExecuteViewCommand(TripLogEntry entry)

@@ -10,7 +10,18 @@ namespace TripLog.ViewModels
 {
     public class NewEntryViewModel : BaseViewModel
     {
-        readonly ILocationService _locService;
+        private readonly ILocationService _locService;
+        private readonly ITripLogDataService _tripLogDataService;
+        public NewEntryViewModel(INavService navService, ILocationService locService, ITripLogDataService tripLogDataService) 
+            : base(navService)
+        {
+            _locService = locService;
+            _tripLogDataService = tripLogDataService;
+
+            Date = DateTime.Today;
+            Rating = 1;
+        }
+
 
         string _title;
         public string Title
@@ -88,13 +99,6 @@ namespace TripLog.ViewModels
             }
         }
 
-        public NewEntryViewModel(INavService navService, ILocationService locService) : base(navService)
-        {
-            _locService = locService;
-
-            Date = DateTime.Today;
-            Rating = 1;
-        }
 
         public override async Task Init()
         {
@@ -124,11 +128,9 @@ namespace TripLog.ViewModels
                     Notes = Notes
                 };
 
-                // TODO: Persist Entry in a later chapter.
-
-                // TODO: Remove this in Chapter 6
-                await Task.Delay(3000);
-
+                //Azure Data Access: Add new entry to Azure database
+                await _tripLogDataService.AddEntryAsync(newItem);
+                //Navigation Service : Go back to the main page
                 await NavService.GoBack();
             }
             finally

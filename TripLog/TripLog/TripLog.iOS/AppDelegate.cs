@@ -5,6 +5,8 @@ using System.Linq;
 using Foundation;
 using TripLog.iOS.Modules;
 using UIKit;
+using Xamarin;
+
 
 namespace TripLog.iOS
 {
@@ -24,9 +26,9 @@ namespace TripLog.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
-            Xamarin.FormsMaps.Init();
+            FormsMaps.Init();
             LoadApplication(new App(new TripLogPlatformModule()));
-
+            
             return base.FinishedLaunching(app, options);
         }
     }

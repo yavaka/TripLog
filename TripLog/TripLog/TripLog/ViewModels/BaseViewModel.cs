@@ -10,6 +10,12 @@ namespace TripLog.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        protected BaseViewModel(INavService navService)
+        {
+            NavService = navService;
+        }
+
+
         protected INavService NavService { get; private set; }
 
         bool _isBusy;
@@ -24,11 +30,6 @@ namespace TripLog.ViewModels
             }
         }
 
-
-        protected BaseViewModel(INavService navService)
-        {
-            NavService = navService;
-        }
 
         public abstract Task Init();
 
