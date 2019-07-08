@@ -28,6 +28,9 @@ namespace TripLog.Modules
                 .ToMethod(x => tripLogService)
                 .InSingletonScope();
 
+            //Akavache (offline data caching)
+            Bind<Akavache.IBlobCache>()
+                .ToConstant(Akavache.BlobCache.LocalMachine);
         }
     }
 }

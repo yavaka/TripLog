@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Akavache;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using TripLog.Models;
@@ -10,11 +11,15 @@ namespace TripLog.ViewModels
     public class MainViewModel : BaseViewModel
     {
         private readonly ITripLogDataService _tripLogDataService;
+        private readonly IBlobCache _cache;
 
-        public MainViewModel(INavService navService, ITripLogDataService tripLogDataService) : base(navService)
+        public MainViewModel(INavService navService, ITripLogDataService tripLogDataService, IBlobCache cache)
+            : base(navService)
         {
             //Azure Data Access
             _tripLogDataService = tripLogDataService;
+            //Offline data cache
+            _cache = cache;
 
             LogEntries = new ObservableCollection<TripLogEntry>();
         }
@@ -58,13 +63,13 @@ namespace TripLog.ViewModels
             }
         }
 
-        
+
         public override async Task Init()
         {
             await LoadEntries();
         }
 
-        async Task LoadEntries()
+        void LoadEntries()
         {
             if (IsBusy)
             {
@@ -77,10 +82,10 @@ namespace TripLog.ViewModels
 
             try
             {
-                //Get entries from azure database
-                var entries = await _tripLogDataService.GetEntriesAsync();
-
-                LogEntries = new ObservableCollection<TripLogEntry>(entries);
+                //Load data from the cache and then get entries from azure database
+                _cache.GetAndFetchLatest("entries", async () => await _tripLogDataService.GetEntriesAsync())
+                    .Subscribe(entries => LogEntries = new ObservableCollection<TripLogEntry>(entries));
+                
             }
             finally
             {
